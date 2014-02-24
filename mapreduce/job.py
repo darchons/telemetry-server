@@ -167,6 +167,8 @@ class Job:
                 print "Skipping mapper", i, "- no input files to process"
         for m in mappers:
             m.join()
+            if m.exitcode:
+                raise OSError("Mapper exited with code %d" % m.exitcode)
 
         # Mappers are done. Reduce.
         reducers = []
@@ -178,6 +180,8 @@ class Job:
             p.start()
         for r in reducers:
             r.join()
+            if r.exitcode:
+                raise OSError("Reducer exited with code %d" % r.exitcode)
 
         # Reducers are done.  Output results.
         to_combine = 1
